@@ -34,6 +34,9 @@ use pocketmine\world\World;
 class Utils{
     public const VEHICLE_TYPE_BOAT = 1;
 
+    public const LIQUID_BLOCK = 1;
+    public const SOLID_BLOCK = 1.375;
+
     public static function createEntityVehicle(World $world, Vector3 $pos, float $yaw, float $pitch, int $vehicleType, int $boatType = 0) : Vehicle{
         return match($vehicleType){
             self::VEHICLE_TYPE_BOAT => new VehicleBoat(Location::fromObject($pos, $world, $yaw, $pitch), CompoundTag::create()->setInt(VehicleBoat::TAG_WOOD_ID, $boatType))
@@ -68,10 +71,6 @@ class Utils{
      * @return float|int
      */
     public static function checkBlockType(Block $block) : float|int{
-        $value = 1;
-        if($block->isSolid()){
-            $value = 1.375;
-        }
-        return $value;
+        return $block->isSolid() ? self::SOLID_BLOCK : self::LIQUID_BLOCK;
     }
 }
