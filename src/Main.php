@@ -24,10 +24,19 @@ namespace nicholass003\vehicles;
 
 use nicholass003\vehicles\entity\vehicle\VehicleBoat;
 use nicholass003\vehicles\event\EventListener;
+use nicholass003\vehicles\item\ExtraVanillaItem;
+use pocketmine\data\bedrock\item\ItemTypeNames;
+use pocketmine\data\bedrock\item\SavedItemData;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
+use pocketmine\item\Boat;
+use pocketmine\item\BoatType;
+use pocketmine\item\Item;
+use pocketmine\item\StringToItemParser;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\AsyncTask;
+use pocketmine\world\format\io\GlobalItemDataHandlers;
 use pocketmine\world\World;
 
 class Main extends PluginBase{
@@ -38,11 +47,52 @@ class Main extends PluginBase{
 
     protected function onEnable() : void{
         $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
+
+        $this->getServer()->getAsyncPool()->addWorkerStartHook(function(int $worker) : void{
+            $this->getServer()->getAsyncPool()->submitTaskToWorker(new class extends AsyncTask{
+                public function onRun() : void{
+                    Main::registerItems();
+                }
+            }, $worker);
+        });
     }
 
     public function registerEntities() : void{
         EntityFactory::getInstance()->register(VehicleBoat::class, function(World $world, CompoundTag $nbt) : VehicleBoat{
             return new VehicleBoat(EntityDataHelper::parseLocation($nbt, $world), $nbt);
         }, ['Boat', 'minecraft:boat']);
+    }
+
+    public static function registerItems() : void{
+        $items = ExtraVanillaItem::getAll();
+        foreach($items as $item){
+            if($item instanceof Boat){
+                self::registerItem((match($item->getType()){
+                    BoatType::OAK() => ItemTypeNames::OAK_CHEST_BOAT,
+                    BoatType::SPRUCE() => ItemTypeNames::SPRUCE_CHEST_BOAT,
+                    BoatType::BIRCH() => ItemTypeNames::BIRCH_CHEST_BOAT,
+                    BoatType::JUNGLE() => ItemTypeNames::JUNGLE_CHEST_BOAT,
+                    BoatType::ACACIA() => ItemTypeNames::ACACIA_CHEST_BOAT,
+                    BoatType::DARK_OAK() => ItemTypeNames::DARK_OAK_CHEST_BOAT,
+                    BoatType::MANGROVE() => ItemTypeNames::MANGROVE_CHEST_BOAT
+                }), $item, (match($item->getType()){
+                    BoatType::OAK() => ["oak_chest_boat"],
+                    BoatType::SPRUCE() => ["spruce_chest_boat"],
+                    BoatType::BIRCH() => ["birch_chest_boat"],
+                    BoatType::JUNGLE() => ["jungle_chest_boat"],
+                    BoatType::ACACIA() => ["acacia_chest_boat"],
+                    BoatType::DARK_OAK() => ["dark_oak_chest_boat"],
+                    BoatType::MANGROVE() => ["mangrove_chest_boat"]
+                }));
+            }
+        }
+    }
+
+    private static function registerItem(string $id, Item $item, array $stringToItemParserNames) : void{
+        GlobalItemDataHandlers::getDeserializer()->map($id, fn() => clone $item);
+        GlobalItemDataHandlers::getSerializer()->map($item, fn() => new SavedItemData($id));
+        foreach($stringToItemParserNames as $name){
+            StringToItemParser::getInstance()->register($name, fn() => clone $item);
+        }
     }
 }
