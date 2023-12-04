@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace nicholass003\vehicles\item;
 
 use pocketmine\data\bedrock\item\ItemTypeNames;
-use pocketmine\item\Boat;
 use pocketmine\item\BoatType;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
@@ -44,9 +43,8 @@ final class ExtraVanillaItem{
     }
 
     protected static function setup() : void{
-        $newId = ItemTypeIds::newId();
-        foreach(BoatType::cases() as $type){
-            self::register(strtolower($type->name) . "_chest_boat", new Boat(new ItemIdentifier($newId), (match($type){
+        foreach(BoatType::getAll() as $type){
+            self::register(strtolower(str_replace(" ", "_", $type->getDisplayName())) . "_chest_boat", new ChestBoat(new ItemIdentifier(ItemTypeIds::newId()), (match($type){
                 BoatType::OAK() => ItemTypeNames::OAK_CHEST_BOAT,
                 BoatType::SPRUCE() => ItemTypeNames::SPRUCE_CHEST_BOAT,
                 BoatType::BIRCH() => ItemTypeNames::BIRCH_CHEST_BOAT,

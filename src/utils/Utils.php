@@ -24,6 +24,7 @@ namespace nicholass003\vehicles\utils;
 
 use nicholass003\vehicles\entity\Vehicle;
 use nicholass003\vehicles\entity\vehicle\VehicleBoat;
+use nicholass003\vehicles\entity\vehicle\VehicleChestBoat;
 use pocketmine\block\Block;
 use pocketmine\entity\Location;
 use pocketmine\item\BoatType;
@@ -33,13 +34,15 @@ use pocketmine\world\World;
 
 class Utils{
     public const VEHICLE_TYPE_BOAT = 1;
+    public const VEHICLE_TYPE_CHEST_BOAT = 2;
 
     public const LIQUID_BLOCK = 1;
     public const SOLID_BLOCK = 1.375;
 
     public static function createEntityVehicle(World $world, Vector3 $pos, float $yaw, float $pitch, int $vehicleType, int $boatType = 0) : Vehicle{
         return match($vehicleType){
-            self::VEHICLE_TYPE_BOAT => new VehicleBoat(Location::fromObject($pos, $world, $yaw, $pitch), CompoundTag::create()->setInt(VehicleBoat::TAG_WOOD_ID, $boatType))
+            self::VEHICLE_TYPE_BOAT => new VehicleBoat(Location::fromObject($pos, $world, $yaw, $pitch), CompoundTag::create()->setInt(VehicleBoat::TAG_WOOD_ID, $boatType)),
+            self::VEHICLE_TYPE_CHEST_BOAT => new VehicleChestBoat(Location::fromObject($pos, $world, $yaw, $pitch), CompoundTag::create()->setInt(VehicleChestBoat::TAG_WOOD_ID, $boatType))
         };
     }
 

@@ -24,6 +24,7 @@ namespace nicholass003\vehicles\event;
 
 use nicholass003\vehicles\entity\Vehicle;
 use nicholass003\vehicles\entity\vehicle\VehicleBoat;
+use nicholass003\vehicles\item\ChestBoat;
 use nicholass003\vehicles\utils\Utils;
 use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
@@ -70,6 +71,12 @@ class EventListener implements Listener{
             if($item instanceof Boat){
                 $pos = $block->getPosition()->add(0.5, Utils::checkBlockType($block), 0.5);
                 $entity = Utils::createEntityVehicle($block->getPosition()->getWorld(), $pos, lcg_value() * 360, 0, Utils::VEHICLE_TYPE_BOAT, Utils::matchBoatType($item->getType()));
+                $item->pop();
+                $player->getInventory()->setItemInHand($item);
+                $entity->spawnToAll();
+            }elseif($item instanceof ChestBoat){
+                $pos = $block->getPosition()->add(0.5, Utils::checkBlockType($block), 0.5);
+                $entity = Utils::createEntityVehicle($block->getPosition()->getWorld(), $pos, lcg_value() * 360, 0, Utils::VEHICLE_TYPE_CHEST_BOAT, Utils::matchBoatType($item->getType()));
                 $item->pop();
                 $player->getInventory()->setItemInHand($item);
                 $entity->spawnToAll();
