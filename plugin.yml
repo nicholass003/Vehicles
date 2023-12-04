@@ -1,6 +1,6 @@
 name: Vehicles
 api: 5.0.0
-version: 0.0.1
+version: 0.0.2
 main: nicholass003\vehicles\Main
 author: nicholass003
 src-namespace-prefix: nicholass003\vehicles
