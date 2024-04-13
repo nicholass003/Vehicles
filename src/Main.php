@@ -1,20 +1,22 @@
 <?php
 
 /*
- *       _      _           _                ___   ___ ____
- *      (_)    | |         | |              / _ \ / _ \___ \
- * _ __  _  ___| |__   ___ | | __ _ ___ ___| | | | | | |__) |
- *| '_ \| |/ __| '_ \ / _ \| |/ _` / __/ __| | | | | | |__ <
- *| | | | | (__| | | | (_) | | (_| \__ \__ \ |_| | |_| |__) |
- *|_| |_|_|\___|_| |_|\___/|_|\__,_|___/___/\___/ \___/____/
+ * Copyright (c) 2024 - present nicholass003
+ *        _      _           _                ___   ___ ____
+ *       (_)    | |         | |              / _ \ / _ \___ \
+ *  _ __  _  ___| |__   ___ | | __ _ ___ ___| | | | | | |__) |
+ * | '_ \| |/ __| '_ \ / _ \| |/ _` / __/ __| | | | | | |__ <
+ * | | | | | (__| | | | (_) | | (_| \__ \__ \ |_| | |_| |__) |
+ * |_| |_|_|\___|_| |_|\___/|_|\__,_|___/___/\___/ \___/____/
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @author nicholass003
- * @link https://github.com/nicholass003/
+ * @author  nicholass003
+ * @link    https://github.com/nicholass003/
+ *
  *
  */
 
@@ -42,59 +44,59 @@ use pocketmine\world\format\io\GlobalItemDataHandlers;
 use pocketmine\world\World;
 
 class Main extends PluginBase{
-    use SingletonTrait;
+	use SingletonTrait;
 
-    protected function onLoad() : void{
-        $this->registerEntities();
+	protected function onLoad() : void{
+		$this->registerEntities();
 
-        self::setInstance($this);
-        
-        $this->getServer()->getAsyncPool()->submitTask(new RegisterItemsTask());
-    }
+		self::setInstance($this);
 
-    protected function onEnable() : void{
-        $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
-    }
+		$this->getServer()->getAsyncPool()->submitTask(new RegisterItemsTask());
+	}
 
-    public function registerEntities() : void{
-        EntityFactory::getInstance()->register(VehicleBoat::class, function(World $world, CompoundTag $nbt) : VehicleBoat{
-            return new VehicleBoat(EntityDataHelper::parseLocation($nbt, $world), $nbt);
-        }, ['Boat', 'minecraft:boat']);
-        EntityFactory::getInstance()->register(VehicleChestBoat::class, function(World $world, CompoundTag $nbt) : VehicleChestBoat{
-            return new VehicleChestBoat(EntityDataHelper::parseLocation($nbt, $world), $nbt);
-        }, ['Chest Boat', 'minecraft:chest_boat']);
-    }
+	protected function onEnable() : void{
+		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
+	}
 
-    public static function registerItems() : void{
-        $items = ExtraVanillaItem::getAll();
-        foreach($items as $item){
-            if($item instanceof ChestBoat){
-                self::registerItem((match($item->getType()){
-                    BoatType::OAK() => ItemTypeNames::OAK_CHEST_BOAT,
-                    BoatType::SPRUCE() => ItemTypeNames::SPRUCE_CHEST_BOAT,
-                    BoatType::BIRCH() => ItemTypeNames::BIRCH_CHEST_BOAT,
-                    BoatType::JUNGLE() => ItemTypeNames::JUNGLE_CHEST_BOAT,
-                    BoatType::ACACIA() => ItemTypeNames::ACACIA_CHEST_BOAT,
-                    BoatType::DARK_OAK() => ItemTypeNames::DARK_OAK_CHEST_BOAT,
-                    BoatType::MANGROVE() => ItemTypeNames::MANGROVE_CHEST_BOAT
-                }), $item, (match($item->getType()){
-                    BoatType::OAK() => ["oak_chest_boat"],
-                    BoatType::SPRUCE() => ["spruce_chest_boat"],
-                    BoatType::BIRCH() => ["birch_chest_boat"],
-                    BoatType::JUNGLE() => ["jungle_chest_boat"],
-                    BoatType::ACACIA() => ["acacia_chest_boat"],
-                    BoatType::DARK_OAK() => ["dark_oak_chest_boat"],
-                    BoatType::MANGROVE() => ["mangrove_chest_boat"]
-                }));
-            }
-        }
-    }
+	public function registerEntities() : void{
+		EntityFactory::getInstance()->register(VehicleBoat::class, function(World $world, CompoundTag $nbt) : VehicleBoat{
+			return new VehicleBoat(EntityDataHelper::parseLocation($nbt, $world), $nbt);
+		}, ['Boat', 'minecraft:boat']);
+		EntityFactory::getInstance()->register(VehicleChestBoat::class, function(World $world, CompoundTag $nbt) : VehicleChestBoat{
+			return new VehicleChestBoat(EntityDataHelper::parseLocation($nbt, $world), $nbt);
+		}, ['Chest Boat', 'minecraft:chest_boat']);
+	}
 
-    private static function registerItem(string $id, Item $item, array $stringToItemParserNames) : void{
-        GlobalItemDataHandlers::getDeserializer()->map($id, fn() => clone $item);
-        GlobalItemDataHandlers::getSerializer()->map($item, fn() => new SavedItemData($id));
-        foreach($stringToItemParserNames as $name){
-            StringToItemParser::getInstance()->register($name, fn() => clone $item);
-        }
-    }
+	public static function registerItems() : void{
+		$items = ExtraVanillaItem::getAll();
+		foreach($items as $item){
+			if($item instanceof ChestBoat){
+				self::registerItem((match($item->getType()){
+					BoatType::OAK() => ItemTypeNames::OAK_CHEST_BOAT,
+					BoatType::SPRUCE() => ItemTypeNames::SPRUCE_CHEST_BOAT,
+					BoatType::BIRCH() => ItemTypeNames::BIRCH_CHEST_BOAT,
+					BoatType::JUNGLE() => ItemTypeNames::JUNGLE_CHEST_BOAT,
+					BoatType::ACACIA() => ItemTypeNames::ACACIA_CHEST_BOAT,
+					BoatType::DARK_OAK() => ItemTypeNames::DARK_OAK_CHEST_BOAT,
+					BoatType::MANGROVE() => ItemTypeNames::MANGROVE_CHEST_BOAT
+				}), $item, (match($item->getType()){
+					BoatType::OAK() => ["oak_chest_boat"],
+					BoatType::SPRUCE() => ["spruce_chest_boat"],
+					BoatType::BIRCH() => ["birch_chest_boat"],
+					BoatType::JUNGLE() => ["jungle_chest_boat"],
+					BoatType::ACACIA() => ["acacia_chest_boat"],
+					BoatType::DARK_OAK() => ["dark_oak_chest_boat"],
+					BoatType::MANGROVE() => ["mangrove_chest_boat"]
+				}));
+			}
+		}
+	}
+
+	private static function registerItem(string $id, Item $item, array $stringToItemParserNames) : void{
+		GlobalItemDataHandlers::getDeserializer()->map($id, fn() => clone $item);
+		GlobalItemDataHandlers::getSerializer()->map($item, fn() => new SavedItemData($id));
+		foreach($stringToItemParserNames as $name){
+			StringToItemParser::getInstance()->register($name, fn() => clone $item);
+		}
+	}
 }
